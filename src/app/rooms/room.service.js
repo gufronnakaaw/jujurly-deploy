@@ -125,7 +125,7 @@ function getByCode(code) {
         }
         const [votes, total_votes] = yield database_1.default.$transaction([
             database_1.default.$queryRaw `SELECT c.id, c.name, COUNT(v.id) AS vote_count,
-    (ROUND(COUNT(v.id) * 100 / (SELECT COUNT(id) FROM votes WHERE room_id = ${room.id}), 2)) as percentage
+    (ROUND(COUNT(v.id) * 100 / NULLIF((SELECT COUNT(id) FROM votes WHERE room_id = ${room.id}), 0), 2)) as percentage
         FROM candidates c
         LEFT JOIN votes v ON c.id = v.candidate_id
       WHERE c.room_id = ${room.id}
@@ -275,19 +275,17 @@ function update(body, userId) {
         });
         if (candidates) {
             const all = candidates.map((candidate) => {
-                return database_1.default.candidate.updateMany({
+                return database_1.default.candidate.upsert({
                     where: {
-                        AND: [
-                            {
-                                id: candidate.id,
-                            },
-                            {
-                                room_id,
-                            },
-                        ],
+                        id: candidate.id,
+                        room_id,
                     },
-                    data: {
+                    update: {
                         name: candidate.name,
+                    },
+                    create: {
+                        name: candidate.name,
+                        room_id,
                     },
                 });
             });
