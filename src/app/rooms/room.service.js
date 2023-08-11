@@ -61,6 +61,11 @@ function remove(body, userId) {
             throw new ResponseError_1.default(404, 'Room not found');
         }
         yield database_1.default.$transaction([
+            database_1.default.vote.deleteMany({
+                where: {
+                    room_id,
+                },
+            }),
             database_1.default.candidate.deleteMany({
                 where: {
                     room_id,
