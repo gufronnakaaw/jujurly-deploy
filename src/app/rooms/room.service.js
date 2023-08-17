@@ -195,7 +195,7 @@ exports.getById = getById;
 function votes(body, userId) {
     return __awaiter(this, void 0, void 0, function* () {
         const valid = (0, validate_1.default)(room_validation_1.createVotesValidation, body);
-        const room = yield database_1.default.room.count({
+        const room = yield database_1.default.room.findFirst({
             where: {
                 AND: [
                     {
@@ -224,6 +224,9 @@ function votes(body, userId) {
         });
         if (!candidate) {
             throw new ResponseError_1.default(404, 'Candidate not found');
+        }
+        if (Date.now() > room.end) {
+            throw new ResponseError_1.default(202, 'Voting has ended');
         }
         const votes = yield database_1.default.vote.count({
             where: {
