@@ -41,6 +41,7 @@ const updateRoomsValidation = zod_1.z.object({
         id: zod_1.z.number().positive(),
         name: zod_1.z.string(),
     }))
+        .min(2)
         .optional(),
 });
 exports.updateRoomsValidation = updateRoomsValidation;

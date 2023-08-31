@@ -103,6 +103,9 @@ function getAll(userId) {
                 end: true,
                 code: true,
             },
+            orderBy: {
+                created_at: 'asc',
+            },
         });
     });
 }
@@ -282,22 +285,35 @@ function update(body, userId) {
             },
         });
         if (candidates) {
-            const all = candidates.map((candidate) => {
-                return database_1.default.candidate.upsert({
-                    where: {
-                        id: candidate.id,
-                        room_id,
+            yield database_1.default.room.update({
+                where: {
+                    id: room_id,
+                },
+                data: {
+                    candidate: {
+                        deleteMany: {
+                            NOT: candidates.map((candidate) => {
+                                return {
+                                    id: candidate.id,
+                                };
+                            }),
+                        },
+                        upsert: candidates.map((candidate) => {
+                            return {
+                                where: {
+                                    id: candidate.id,
+                                },
+                                update: {
+                                    name: candidate.name,
+                                },
+                                create: {
+                                    name: candidate.name,
+                                },
+                            };
+                        }),
                     },
-                    update: {
-                        name: candidate.name,
-                    },
-                    create: {
-                        name: candidate.name,
-                        room_id,
-                    },
-                });
+                },
             });
-            yield Promise.all(all);
         }
         const update = yield database_1.default.room.findFirst({
             where: {
