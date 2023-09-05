@@ -33,6 +33,7 @@ exports.getRoomsByCodeSchema = {
                 end: { type: 'number' },
                 code: { type: 'string' },
                 total_votes: { type: 'number' },
+                is_available: { type: 'boolean' },
                 candidates: {
                     type: 'array',
                     items: {

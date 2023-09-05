@@ -110,7 +110,7 @@ function getAll(userId) {
     });
 }
 exports.getAll = getAll;
-function getByCode(code) {
+function getByCode(code, userId) {
     return __awaiter(this, void 0, void 0, function* () {
         const valid = (0, validate_1.default)(room_validation_1.getRoomsValidation, { code });
         const room = yield database_1.default.room.findFirst({
@@ -131,7 +131,7 @@ function getByCode(code) {
         if (Date.now() < room.start) {
             throw new ResponseError_1.default(202, 'Voting has not started');
         }
-        const [votes, total_votes] = yield database_1.default.$transaction([
+        const [votes, total_votes, is_available] = yield database_1.default.$transaction([
             database_1.default.$queryRaw `SELECT c.id, c.name, COUNT(v.id) AS vote_count,
     (ROUND(COUNT(v.id) * 100 / NULLIF((SELECT COUNT(id) FROM votes WHERE room_id = ${room.id}), 0), 2)) as percentage
         FROM candidates c
@@ -143,6 +143,18 @@ function getByCode(code) {
                     room_id: room.id,
                 },
             }),
+            database_1.default.vote.count({
+                where: {
+                    AND: [
+                        {
+                            room_id: room.id,
+                        },
+                        {
+                            user_id: userId,
+                        },
+                    ],
+                },
+            }),
         ]);
         const candidates = votes.map(({ id, name, vote_count, percentage }) => {
             return {
@@ -152,8 +164,7 @@ function getByCode(code) {
                 vote_count: Number(vote_count),
             };
         });
-        return Object.assign(Object.assign({}, room), { total_votes,
-            candidates });
+        return Object.assign(Object.assign({}, room), { total_votes, is_available: Boolean(!is_available), candidates });
     });
 }
 exports.getByCode = getByCode;

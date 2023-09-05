@@ -63,7 +63,7 @@ function routes(fastify) {
                 if (code) {
                     const response = rep.serializeInput({
                         success: true,
-                        data: yield (0, room_service_1.getByCode)(code),
+                        data: yield (0, room_service_1.getByCode)(code, userId),
                     }, room_schema_1.getRoomsByCodeSchema);
                     return rep
                         .code(200)
