@@ -137,7 +137,8 @@ function getByCode(code, userId) {
         FROM candidates c
         LEFT JOIN votes v ON c.id = v.candidate_id
       WHERE c.room_id = ${room.id}
-    GROUP BY c.id, c.name;`,
+    GROUP BY c.id, c.name 
+    ORDER BY c.id ASC;`,
             database_1.default.vote.count({
                 where: {
                     room_id: room.id,
