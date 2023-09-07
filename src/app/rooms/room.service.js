@@ -128,9 +128,6 @@ function getByCode(code, userId) {
         if (!room) {
             throw new ResponseError_1.default(404, 'Room not found');
         }
-        if (Date.now() < room.start) {
-            throw new ResponseError_1.default(202, 'Voting has not started');
-        }
         const [votes, total_votes, is_available] = yield database_1.default.$transaction([
             database_1.default.$queryRaw `SELECT c.id, c.name, COUNT(v.id) AS vote_count,
     (ROUND(COUNT(v.id) * 100 / NULLIF((SELECT COUNT(id) FROM votes WHERE room_id = ${room.id}), 0), 2)) as percentage
