@@ -154,15 +154,7 @@ function getByCode(code, userId) {
                 },
             }),
         ]);
-        const candidates = votes.map(({ id, name, vote_count, percentage }) => {
-            return {
-                id,
-                name,
-                percentage: !percentage ? 0 : percentage,
-                vote_count: Number(vote_count),
-            };
-        });
-        return Object.assign(Object.assign({}, room), { total_votes, is_available: Boolean(!is_available), candidates });
+        return Object.assign(Object.assign({}, room), { total_votes, is_available: Boolean(!is_available), candidates: votes });
     });
 }
 exports.getByCode = getByCode;
@@ -236,6 +228,9 @@ function votes(body, userId) {
         });
         if (!candidate) {
             throw new ResponseError_1.default(404, 'Candidate not found');
+        }
+        if (Date.now() < room.start) {
+            throw new ResponseError_1.default(202, 'Voting has not started');
         }
         if (Date.now() > room.end) {
             throw new ResponseError_1.default(202, 'Voting has ended');
