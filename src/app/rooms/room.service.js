@@ -278,6 +278,9 @@ function update(body, userId) {
         if (!room) {
             throw new ResponseError_1.default(404, 'Room not found');
         }
+        if (Date.now() > room.start || Date.now() > room.end) {
+            throw new ResponseError_1.default(403, 'Forbidden');
+        }
         yield database_1.default.room.update({
             where: {
                 id: room_id,
