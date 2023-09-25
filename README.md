@@ -2,5 +2,5 @@
 
 - [Typescript](https://www.typescriptlang.org)
 - [Fastify](https://fastify.dev)
-- [Supabase PostgreSQL](https://supabase.com/database)
+- [Neon Serverless PostgreSQL](https://neon.tech)
 - [Cyclic](https://www.cyclic.sh)
