@@ -60,8 +60,8 @@ function createRooms() {
         yield database_1.default.room.create({
             data: {
                 name: 'Create Room Test',
-                start: 1690776168631,
-                end: 1690776168631,
+                start: Date.now(),
+                end: Date.now() + 7 * 24 * 60 * 60 * 1000,
                 code: (0, generate_1.default)(8),
                 user_id: user.id,
                 candidate: {
@@ -88,8 +88,8 @@ function createManyRooms() {
             yield database_1.default.room.create({
                 data: {
                     name: `Create Room Test ${i}`,
-                    start: 1690776168631,
-                    end: 1690776168631,
+                    start: Date.now(),
+                    end: Date.now() + 7 * 24 * 60 * 60 * 1000,
                     code: (0, generate_1.default)(8),
                     user_id: user.id,
                     candidate: {

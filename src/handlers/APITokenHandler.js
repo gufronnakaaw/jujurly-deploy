@@ -12,16 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const ErrorHandler_1 = __importDefault(require("../../handlers/ErrorHandler"));
-const user_route_1 = __importDefault(require("../../app/users/user.route"));
-const room_route_1 = __importDefault(require("../../app/rooms/room.route"));
-const admin_route_1 = __importDefault(require("../../app/admin/admin.route"));
-function routes(fastify) {
+const ResponseError_1 = __importDefault(require("../error/ResponseError"));
+const database_1 = __importDefault(require("../utils/database"));
+function APITokenHandler(req, rep, done) {
     return __awaiter(this, void 0, void 0, function* () {
-        fastify.register(user_route_1.default, { prefix: 'users' });
-        fastify.register(room_route_1.default, { prefix: 'rooms' });
-        fastify.register(admin_route_1.default, { prefix: 'admin' });
-        fastify.setErrorHandler(ErrorHandler_1.default);
+        const { api_token } = req.headers;
+        if (!api_token) {
+            throw new ResponseError_1.default(401, 'Unauthorized');
+        }
+        const token = yield database_1.default.token.findFirst({
+            where: {
+                value: api_token,
+            },
+        });
+        if (!token) {
+            throw new ResponseError_1.default(401, 'Unauthorized');
+        }
+        if (Date.now() > token.expired) {
+            throw new ResponseError_1.default(401, 'Unauthorized');
+        }
+        done();
     });
 }
-exports.default = routes;
+exports.default = APITokenHandler;

@@ -804,6 +804,7 @@ function doLogin() {
             end: globals_1.expect.any(Number),
             code: globals_1.expect.any(String),
             total_votes: globals_1.expect.any(Number),
+            is_available: globals_1.expect.any(Boolean),
             candidates: globals_1.expect.arrayContaining([
                 globals_1.expect.objectContaining({
                     id: globals_1.expect.any(Number),
@@ -834,57 +835,6 @@ function doLogin() {
                 message: globals_1.expect.any(String),
             }),
         ]));
-    }));
-    (0, globals_1.it)('should cannot get rooms if voting has not started', () => __awaiter(void 0, void 0, void 0, function* () {
-        const fastifyServer = (0, server_1.default)();
-        const token = yield doLogin();
-        const createRoom = yield fastifyServer.inject({
-            method: 'POST',
-            url: `/api/v1/rooms`,
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-            payload: {
-                name: 'Create Room Test Again',
-                start: Date.now() + 150000000,
-                end: 1690776168631,
-                candidates: [
-                    {
-                        name: 'Candidate Test 1',
-                    },
-                    {
-                        name: 'Candidate Test 2',
-                    },
-                ],
-            },
-        });
-        const response = yield fastifyServer.inject({
-            method: 'GET',
-            url: `/api/v1/rooms?code=${createRoom.json().data.code}`,
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-        });
-        (0, globals_1.expect)(response.statusCode).toBe(202);
-        (0, globals_1.expect)(response.json()).toHaveProperty('success');
-        (0, globals_1.expect)(response.json()).toHaveProperty('errors');
-        (0, globals_1.expect)(response.json().success).toBeFalsy();
-        (0, globals_1.expect)(response.json().errors).toEqual(globals_1.expect.arrayContaining([
-            globals_1.expect.objectContaining({
-                message: globals_1.expect.any(String),
-            }),
-        ]));
-        yield fastifyServer.inject({
-            method: 'DELETE',
-            url: `/api/v1/rooms`,
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-            payload: {
-                room_id: createRoom.json().data.id,
-                code: createRoom.json().data.code,
-            },
-        });
     }));
     (0, globals_1.it)('should cannot get rooms if code invalid', () => __awaiter(void 0, void 0, void 0, function* () {
         const fastifyServer = (0, server_1.default)();
